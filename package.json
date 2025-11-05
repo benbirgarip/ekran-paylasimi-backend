@@ -1,0 +1,27 @@
+{
+  "name": "ekran-paylasimi-backend",
+  "version": "1.0.0",
+  "description": "Ekran paylaşımı uygulaması - Signaling Server",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18.x"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "vercel-build": "echo 'No build step required'"
+  },
+  "keywords": ["webrtc", "screen-sharing", "socket.io"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1",
+    "cors": "^2.8.5",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
+
