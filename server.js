@@ -96,6 +96,31 @@ io.on('connection', (socket) => {
     });
   });
 
+  // WebRTC renegotiation - viewer'dan host'a
+  socket.on('renegotiate-offer', ({ offer, targetId }) => {
+    console.log(`[WEBRTC] Renegotiate Offer: ${socket.id} -> ${targetId}`);
+    if (socket.nunuk) {
+      const room = rooms.get(socket.nunuk);
+      if (room && room.host) {
+        // Viewer'dan host'a renegotiation offer gönder
+        io.to(room.host).emit('renegotiate-offer', {
+          offer,
+          senderId: socket.id
+        });
+        console.log(`[WEBRTC] Renegotiate offer gonderildi: ${socket.id} -> ${room.host}`);
+      }
+    }
+  });
+
+  // WebRTC renegotiation - host'tan viewer'a answer
+  socket.on('renegotiate-answer', ({ answer, targetId }) => {
+    console.log(`[WEBRTC] Renegotiate Answer: ${socket.id} -> ${targetId}`);
+    io.to(targetId).emit('renegotiate-answer', {
+      answer,
+      senderId: socket.id
+    });
+  });
+
   // Ekran paylaşımı başladı
   socket.on('start-sharing', ({ settings }) => {
     if (socket.role === 'host' && socket.nunuk) {
