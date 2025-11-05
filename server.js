@@ -122,6 +122,44 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Audio durumu değişti (mute/unmute)
+  socket.on('audio-state-changed', ({ isMuted, userId, role }) => {
+    console.log(`[AUDIO] ${userId} ses durumu: ${isMuted ? 'Kapalı' : 'Açık'}`);
+    
+    if (socket.nunuk) {
+      const room = rooms.get(socket.nunuk);
+      if (room) {
+        // Tüm katılımcılara bildir
+        const targets = role === 'host' ? room.viewers : [room.host, ...room.viewers.filter(id => id !== socket.id)];
+        targets.forEach(targetId => {
+          io.to(targetId).emit('participant-audio-changed', {
+            userId: socket.id,
+            isMuted,
+            role
+          });
+        });
+      }
+    }
+  });
+
+  // Konuşma aktivitesi (ses seviyesi)
+  socket.on('speaking-state', ({ isSpeaking, level }) => {
+    if (socket.nunuk) {
+      const room = rooms.get(socket.nunuk);
+      if (room) {
+        const targets = socket.role === 'host' ? room.viewers : [room.host];
+        targets.forEach(targetId => {
+          io.to(targetId).emit('participant-speaking', {
+            userId: socket.id,
+            isSpeaking,
+            level,
+            role: socket.role
+          });
+        });
+      }
+    }
+  });
+
   // Chat mesajı gönderme
   socket.on('chat-message', ({ message, senderName, senderRole }) => {
     console.log('[CHAT] ===== MESAJ ALINDI =====');
